@@ -1,5 +1,5 @@
 import { userService } from "../../services";
-import { errorHandlerWrapper } from "../../utils";
+import { errorHandlerWrapper, generateToken } from "../../utils";
 import { encryptPassword } from "../../utils/encrypt";
 import httpStatus from "http-status";
 
@@ -11,7 +11,11 @@ const registerHandler = async (req, res) => {
     email,
     password: hashPassword,
   });
-  res.json({ user }).status(httpStatus.CREATED);
+  if(!user){
+    res.json({ message:"User already exist." }).status(httpStatus.BAD_REQUEST);
+  }
+  const token = generateToken(user.uuid);
+  res.json({ user, token }).status(httpStatus.CREATED);
 };
 
 export const registerController = errorHandlerWrapper(registerHandler);
